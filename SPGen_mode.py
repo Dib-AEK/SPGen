@@ -259,7 +259,97 @@ class SPGen(Model):
         df = df.groupby(by='trip_id').apply(lambda x: x.to_dict(orient='list'))
         df = pd.DataFrame.from_records(df.tolist(),index=df.index)
         return df
+ 
+    def plot_figures(self,positions,speed_profiles,velocity,n=64):
+        folder = self.encoder.name+'_'+self.generator.name
+        dir_path = 'images/PGen/'+folder
+        F.create_folder_if_doesnt_exists(dir_path)
+        for i in range(n):
+            plt.subplots(figsize=(20,7))
+            plt.plot(positions[i],velocity[i])
+            plt.plot(positions[i],speed_profiles[i])
+            plt.xlabel('position [km]')
+            plt.ylabel('velocity [km/h]')
+            plt.legend(['GT','Predictions'])
+            plt.grid()
+            plt.savefig(dir_path+'/'+str(i)+'.jpeg',dpi=150,bbox_inches='tight')
+            plt.close() 
+  
+    def plot_some_profiles(self,num,data_path,how = 'max_from_k',k=3):
+        if not hasattr(self,'data'):
+            self.data = F.EncDataset(data_path=data_path, input_columns=self.encoder_inputs, 
+                                     output_columns=self.encoder_outputs,  network_columns=self.json_file['network_columns'],
+                                     NETWORK_SCALING_FACTOR=self.network_scaling_factor,
+                                     VELOCITY_SCALING_FACTOR=self.velocity_scaling_factor, batch_size=256,
+                                     training=False, max_length=800, dtype='float32',
+                                     sample_weights_on=[],sample_weight=0.)
+            
+
+        steps = int(num/256)+1
+        velocities=[]
+        positions = []
+        speed_profiles = []
+        timegts=[]
+        timegns=[]
+        X = []
         
+        for i in range(steps):
+            # Load some data:
+            length_min=0
+            first_time = True
+            while length_min<180:    
+                (x,_,in_velocity,velocity),_ = self.data.__getitem__(0) 
+                length_min = x.shape[1]
+            first_time = False
+            
+            x,velocity  = x[:,:170,:],velocity[:,:170,:]
+            # Predictions
+            position,speed_profile,timegn  = self.generate_speed_profile(x = x, 
+                                                                   in_velocity = in_velocity, 
+                                                                   k = k)
+            # For comparaison :
+            velocity = self.delete_same_positions_points(velocity) 
+            timegt = self.construct_time_vector(position,velocity)
+            # add them to lists
+            velocities.append(velocity)
+            positions.append(position)
+            speed_profiles.append(speed_profile)
+            timegts.append(timegt)
+            timegns.append(timegn)
+            X.append(x)
+        
+        # Plot speed profiles
+        self.plot_figures(positions[-1],speed_profiles[-1],velocity,n=128)
+        
+        # construct a DataFrame
+        speed_profiles = tf.concat(speed_profiles,axis=0).numpy().tolist()
+        positions      = tf.concat(positions,axis=0).numpy().tolist()
+        timegns        = tf.concat(timegns,axis=0).numpy().tolist()
+        velocities     = tf.concat(velocities,axis=0).numpy().tolist()
+        timegts        = tf.concat(timegts,axis=0).numpy().tolist()
+        X              = tf.concat(X,axis=0)
+        
+        df      = pd.DataFrame.from_dict({
+                        'positions':positions,
+                        'velocity':velocities,
+                        'time':timegts,
+                        'generated_speed':speed_profiles,
+                        'generated_time':timegns
+                        })
+     
+        signal_gn = self.signal_validity(df.generated_speed)
+        signal_gt = self.signal_validity(df.velocity)
+        df['signal_velocity'] = signal_gt
+        df['signal_generated_speed'] = signal_gn
+        
+        idx_ms = self.encoder.inputs.index('MeanSpeed')
+        idx_ln = self.encoder.inputs.index('linkLength')
+        link_lengths = X[:,:,idx_ln]*self.network_scaling_factor['linkLength']
+        mean_speeds = X[:,:,idx_ms]*self.network_scaling_factor['MeanSpeed']  
+        
+        df['lengths'] = link_lengths.numpy().tolist()
+        df['mean_speed'] = mean_speeds.numpy().tolist()
+        return df
 
 
 
