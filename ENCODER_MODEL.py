@@ -53,16 +53,16 @@ class Encoder(Model):
         x, m, _ = self.pred_layer(x, shifted_y)
         return x, m
 
-    def train(self, batch_size, learning_rate, epochs, data_path, validation_data_path, max_length, 
+     def train(self, batch_size, learning_rate, epochs, data_path, validation_data_path, network_columns, max_length, 
                     sample_weights_on, sample_weight, parallel = False, **kwargs):
 
         self.data = F.EncDataset(data_path=data_path, input_columns=self.inputs, output_columns=self.outputs,
-                               NETWORK_SCALING_FACTOR=self.network_scaling_factor,
+                               network_columns=network_columns, NETWORK_SCALING_FACTOR=self.network_scaling_factor,
                                VELOCITY_SCALING_FACTOR=self.velocity_scaling_factor, batch_size=batch_size,
                                training=True, max_length=max_length, dtype='float32',parallel=parallel,
                                sample_weights_on=sample_weights_on,sample_weight=sample_weight)
         self.val_data = F.EncDataset(data_path=validation_data_path, input_columns=self.inputs, output_columns=self.outputs,
-                           NETWORK_SCALING_FACTOR=self.network_scaling_factor,
+                           network_columns=network_columns, NETWORK_SCALING_FACTOR=self.network_scaling_factor,
                            VELOCITY_SCALING_FACTOR=self.velocity_scaling_factor, batch_size=128,
                            training=True, max_length=max_length, dtype='float32',parallel=parallel,
                            sample_weights_on=sample_weights_on,sample_weight=sample_weight)
