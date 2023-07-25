@@ -118,11 +118,11 @@ class Encoder(Model):
         return cls(**config)
 
     def make_inference_model(self, return_it=False):
-        ### bi_lstm model
+        ### Encoder model
         inputs = Input((None,self.layers[0].weights[0].shape[0]))
         outputs = self.enc_layer(inputs)
         self.encoder_model = Model(inputs,outputs)
-        ### predictions model
+        ### Decoder model
         outputs = self.outputs
         pred_layer = self.pred_layer
         sampling_layer = EncSamplingLayer()
