@@ -19,7 +19,8 @@ from Layers import (EncEnc, EncPredictionBlock, negloglik, MinMaxConstraints, En
 
 
 class Encoder(Model):
-    """ This is an RNN model capturing the distribution of different features """
+    """ This is an RNN model capturing the distribution of minimum, maximum, and exit
+    speed for a sequence of links that forms a trip"""
 
     def __init__(self, inputs, outputs, units, l1, l2, velocity_scaling_factor,
                  network_scaling_factor, name='First_stage'):
@@ -35,7 +36,7 @@ class Encoder(Model):
         self.enc_layer = EncEnc(preprocessing_units=units,
                                 l1=l1,
                                 l2=l2,
-                                name=name + '_encoder_layer',
+                                name=name + '_bilstm_layer',
                                 _dtype='float32')
         self.pred_layer = EncPredictionBlock(units=units,
                                              l1=l1,
@@ -46,7 +47,7 @@ class Encoder(Model):
 
     def call(self, inputs):
         x, shifted_y = inputs
-        # Preprocessing
+        # bi-lstm
         x = self.enc_layer(x)
         # Predictions
         x, m, _ = self.pred_layer(x, shifted_y)
@@ -65,16 +66,15 @@ class Encoder(Model):
                            VELOCITY_SCALING_FACTOR=self.velocity_scaling_factor, batch_size=128,
                            training=True, max_length=max_length, dtype='float32',parallel=parallel,
                            sample_weights_on=sample_weights_on,sample_weight=sample_weight)
-        #self.dataset = self.data.get_encoder_dataset()
+        
         print("    training ...")
-
         # Learning rate decay
         callbacks = []
-        scheduler = lambda epoch, lr: learning_rate * np.exp(-5.5 * epoch / epochs)
+        scheduler = lambda epoch, lr: learning_rate * np.exp(-4 * epoch / epochs)
         callbacks.append(tf.keras.callbacks.LearningRateScheduler(scheduler))
 
         # Compile the model :
-        optimizer = tf.keras.optimizers.experimental.AdamW(learning_rate=learning_rate)
+        optimizer = tf.keras.optimizers.experimental.AdamW(learning_rate=learning_rate) #tf.keras.optimizers.Adam(learning_rate=learning_rate)
         lossFunction = [negloglik(), 'mean_squared_logarithmic_error']
 
         self.compile(optimizer=optimizer,
@@ -85,7 +85,6 @@ class Encoder(Model):
                                       validation_data = self.val_data,
                                       callbacks=callbacks,
                                       epochs=epochs,
-                                      #steps_per_epoch=len(self.data),
                                       ** kwargs)
 
     def plot_history(self):
@@ -119,11 +118,11 @@ class Encoder(Model):
         return cls(**config)
 
     def make_inference_model(self, return_it=False):
-        ### Encoder model
+        ### bi_lstm model
         inputs = Input((None,self.layers[0].weights[0].shape[0]))
         outputs = self.enc_layer(inputs)
         self.encoder_model = Model(inputs,outputs)
-        ### Decoder model
+        ### predictions model
         outputs = self.outputs
         pred_layer = self.pred_layer
         sampling_layer = EncSamplingLayer()
@@ -164,7 +163,7 @@ class Encoder(Model):
         if (not hasattr(self, 'decoder_model')) or (not hasattr(self, 'encoder_model')):
             self.make_inference_model()
 
-        # Pass the encoder throught the sequence
+        # Pass the bi_lstm the sequence
         x = self.encoder_model(input_seq)
 
         # initilize states and outputs:
