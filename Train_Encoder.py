@@ -2,7 +2,7 @@
 """
 Created on Wed 23/02/2023
 
-@author: diba
+@author: Abdelkader DIB
 """
 
 from ENCODER_MODEL import Encoder
