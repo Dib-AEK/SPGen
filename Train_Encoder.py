@@ -39,10 +39,6 @@ MAX_LENGTH = 800
 WEIGHTS_ON = ['TRAFFIC_SIGNAL','STOP']
 WEIGHT = 5.
 
-# Train or load
-train_the_model = False
-weights_path = os.path.join(os.getcwd(),'models','encoders',ENCODER_NAME + '_units' + str(UNITS),'weights')
-
 # Define and train the model
 with tf.device('GPU:0'):
     first_stage_model = Encoder(inputs=MODEL_INPUTS, outputs=MODEL_OUTPUTS, units=UNITS, l1=L1, l2=L2, name=ENCODER_NAME,
