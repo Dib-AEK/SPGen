@@ -50,16 +50,16 @@ class Generator(Model):
 
         return x,mean
     
-    def train(self,batch_size, learning_rate, epochs, data_path, val_data_path, 
+    def train(self,batch_size, learning_rate, epochs, data_path, val_data_path, network_columns,
               extra_data_path,**kwargs):
        
         self.data = F.GenDataset( data_path=data_path, inputs=self.inputs, 
-                                  batch_size=batch_size,
+                                  network_columns=network_columns, batch_size=batch_size,
                                   NETWORK_SCALING_FACTOR=self.network_scaling_factor,
                                   VELOCITY_SCALING_FACTOR=self.velocity_scaling_factor,
                                   extra_data_path=extra_data_path)
         self.val_data = F.GenDataset( data_path=val_data_path, inputs=self.inputs, 
-                                      batch_size=256,
+                                      network_columns=network_columns, batch_size=256,
                                       NETWORK_SCALING_FACTOR=self.network_scaling_factor,
                                       VELOCITY_SCALING_FACTOR=self.velocity_scaling_factor)
         #self.dataset = self.data.get_encoder_dataset()
@@ -110,12 +110,12 @@ class Generator(Model):
         plt.savefig('images\Generators\ ' +self.fig_name + '_loss.jpeg')
  
     def make_inference_model(self):
-        ### states generator model
+        ### Encoder model
         inputs = tf.keras.Input((len(self.inputs),))
         states = self.enc_layer(inputs)
         self.encoder_model = Model(inputs=inputs,outputs=states)
 
-        ### predictions model
+        ### Decoder model
         resolution = self.resolution
         pred_layer = self.pred_layer    
         gen_sampling_layer = GenSamplingLayer(resolution) #x<=(out,k,i)
