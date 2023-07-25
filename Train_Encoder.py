@@ -47,4 +47,11 @@ with tf.device('GPU:0'):
                             validation_data_path=validation_data_path, network_columns=network_columns, 
                             max_length=MAX_LENGTH,parallel=False, sample_weights_on=WEIGHTS_ON, sample_weight=WEIGHT)
     first_stage_model.save("First_stage_model")
+
+first_stage_model.make_inference_model()
+first_stage_model.encoder_model.save('models/enc_encoder.h5')
+first_stage_model.decoder_model.save('models/enc_decoder.h5')
+
+
+
     
