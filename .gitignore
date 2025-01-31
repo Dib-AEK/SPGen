@@ -1,0 +1,16 @@
+# Ignore operating system files
+Thumbs.db  # Windows
+
+# Ignore Python bytecode files
+__pycache__/
+*.pyc
+
+# Ignore logs
+*.log
+
+# Ignore IDE-specific files
+.vscode/
+
+# Ignore csv and parquet files
+.csv
+.parquet
