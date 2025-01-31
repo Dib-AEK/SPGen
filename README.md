@@ -1,25 +1,29 @@
-# SPGen
-## A Two-Stage Deep Learning Based Approach for Predicting Instantaneous Vehicle Speed Profiles on Road Networks
+# SPGen: Speed Profiles Generator
+Welcome to SPGen, a tool for generating speed profiles using deep learning techniques, specifically Long Short-Term Memory networks (LSTMs).
 
+## Overview
+SPGen is a repository showcasing how to use the deep learning model for generating instantaneous vehicle speed profiles on road networks.
 
-Accurate prediction of vehicle speed profiles is crucial for various transportation and vehicular applications. However, this task poses challenges due to the complexity and uncertainty of the multiple factors influencing driver behavior. In our research, we propose an innovative data-driven model that addresses these challenges. Our model employs a deep two-stage long short-term memory (LSTM) architecture to effectively capture the intricate relationship between vehicle speed and macroscopic road attributes.
+## Getting Started
+The main.ipynb notebook serves as a comprehensive guide, providing an example of how to leverage SPGen to generate dynamic speed profiles.
 
-By integrating road features, which can be obtained from different online map services, and average speeds as inputs, our model generates naturalistic speed profiles for a given route. This approach leverages the power of LSTM, a type of recurrent neural network (RNN) capable of learning patterns from sequential data, to analyze and predict speed variations based on road characteristics.
+## Remark
+We've fine-tuned the hyperparameters to marespecting the average speed 🏎️💨 Well, as a result, this is only one of many versions of the model.
 
-The utilization of a data-driven approach and the incorporation of various road attributes make our model capable of producing accurate and contextually relevant speed predictions. 
+## Quick Start:
+Clone this repository to your local machine.
+Open main.ipynb in your favorite Jupyter environment.
+Follow the step-by-step instructions to generate your first speed profiles.
 
-the details of the model are described in our conference paper presented at the 26th IEEE International Conference on Intelligent Transportation Systems ITSC 2023:
-**Dib.A, Sciarretta, A., Balac.M (2023). A Two-Stage Deep Learning Based Approach for Predicting Instantaneous Vehicle Speed Profiles on Road Networks. In Proceedings of the 26th IEEE International Conference on Intelligent Transportation Systems (ITSC 2023).**
+For a deeper understanding of the model architecture, training process, and insights into its predictive prowess, check out our detailed paper:
 
-![Alt Text](images/some_profiles.JPG)
+Paper Title: "A Two-Stage Deep Learning-Based Approach for Predicting Instantaneous Vehicle Speed Profiles on Road Networks"
 
-## code
-Please be aware that the code version provided here serves only as an illustrative example of our model and should not be considered the final version. If you require more detailed information or have any inquiries, please don't hesitate to contact us at abdelkader.dib@ifpen.fr. We would be pleased to provide you with further insights and assistance.
+Authors: A. Dib, A. Sciarretta, M. Balac
 
-**ENCODER_MODEL** :  This file contains the first stage model.  
-**GENERATOR_MODEL** :  This file contains the second stage model.  
-**SPGen_model** : This file contains the whole model, the input can be in the form of pandas dataframe containing sequences of roads features and average speeds and the outputs are speed profiles.  
-**Functions** : This file contains some functions that are used for training and for inference. The data pipeline aren't that efficient.  
+Conference: 2023 IEEE 26th International Conference on Intelligent Transportation Systems (ITSC)
 
-## Data
-Coming soon! A sample of our data will be published. For more details, contact us at abdelkader.dib@ifpen.fr.
+Publication Status: To be published
+
+## Contribute and Collaborate
+We welcome contributions and collaborations to enhance SPGen's capabilities. Feel free to reach out for further discussions and explorations. If you want a costum model, just prepare the training dataset ! 
