@@ -33,7 +33,7 @@ from SPGen import SPGen
 df = pd.read_csv('input_data.csv')
 
 # Preprocess the data
-df = ... df
+df = ... 
 
 # Initiate the first speed value 
 in_velocity = ...
