@@ -58,6 +58,11 @@ A. Dib, A. Sciarretta and M. Balac, "A Two-Stage Deep Learning Based Approach fo
 
 If you use SPGen in your research, please cite the above paper.
 
+## Additional information
+----------
+A filter is used in SPGen/SPGen.py in order to prevent from having large accelerations. The filter can be removed or replaced.
+
+
 ## Contributing
 ------------
 
